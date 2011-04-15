@@ -11,21 +11,16 @@ def page_info(request):
 
     url = request.path_info
 
-    """
-    Find Page that matches the requested URL.
-
-    First check if there is a Page whose `url` matches the requested URL.
-    """
+    # Find Page that matches the requested URL.
+    # First check if there is a Page whose `url` matches the requested URL.
     try:
         page = Page.objects.get(url__exact=url)
     except Page.DoesNotExist:
         pass
 
-    """
-    If no Page has been found, check a subset of Pages (whose `url` or
-    `relative_url` contain the rightmost part of the requested URL), to see
-    if their `get_absolute_url()` matches the requested URL entirely.
-    """
+    # If no Page has been found, check a subset of Pages (whose `url` or
+    # `relative_url` contain the rightmost part of the requested URL), to see
+    # if their `get_absolute_url()` matches the requested URL entirely.
     if not page:
         last_url_part = url.rstrip('/').rsplit('/', 1)[-1]
         if last_url_part:
@@ -37,10 +32,8 @@ def page_info(request):
                         page = page_candidate
                         break
 
-    """
-    If no Page has been found, try to find a Page by matching the
-    requested URL with reversed `named_url`s.
-    """
+    # If no Page has been found, try to find a Page by matching the
+    # requested URL with reversed `named_url`s.
     if not page:
         page_candidates = Page.objects.exclude(url__exact='')
         if page_candidates:
@@ -50,30 +43,22 @@ def page_info(request):
                         page = page_candidate
                         break
 
-    """
-    Block access to pages that the current user isn't supposed to see.
-    """
+    # Block access to pages that the current user isn't supposed to see.
     if request.user.is_authenticated():
         if page:
             if page not in Page.objects.visible_pages_for_user(request.user):
                 page = None
 
-    """
-    Find pages that should be marked as current in menus.
-    """
+    # Find pages that should be marked as current in menus.
     if page:
-        """
-        The current page should be marked as current, obviously,
-        as well as all its ancestors.
-        """
+        # The current page should be marked as current, obviously,
+        # as well as all its ancestors.
         current_pages.append(page)
         current_pages.extend(page.get_ancestors())
 
-    """
-    For all pages that are not already current_pages,
-    check if one of the `mark_current_regexes` matches the requested URL.
-    If so, add the page and all its ancestors to the current_pages list.
-    """
+    # For all pages that are not already current_pages,
+    # check if one of the `mark_current_regexes` matches the requested URL.
+    # If so, add the page and all its ancestors to the current_pages list.
     current_page_candidates = Page.objects.exclude(mark_current_regexes__exact='')
     for current_page_candidate in list(set(current_page_candidates) - set(current_pages)):
         for mark_current_regex in current_page_candidate.mark_current_regexes.strip().splitlines():
@@ -82,10 +67,8 @@ def page_info(request):
                 current_pages.extend(current_page_candidate.get_ancestors())
                 break
 
-    """
-    Order current_pages for use with tree_info template tag,
-    and remove the root node in the process.
-    """
+    # Order current_pages for use with tree_info template tag,
+    # and remove the root node in the process.
     current_pages = sorted(current_pages, key=lambda current_page: current_page.lft)[1:]
 
     if page:

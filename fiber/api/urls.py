@@ -1,10 +1,7 @@
 from django.conf.urls.defaults import *
-
+from fiber.api.authentication import DjangoStaffAuthentication, DjangoUploadAuthentication
+from fiber.api.handlers import PageHandler, PageContentItemHandler, ImageHandler, FileHandler, FileUploadHandler, ImageUploadHandler, ContentItemHandler
 from piston.resource import Resource
-
-from authentication import DjangoStaffAuthentication, DjangoUploadAuthentication
-from handlers import PageHandler, PageContentItemHandler, ImageHandler, FileHandler, FileUploadHandler, ImageUploadHandler, ContentItemHandler
-from emitters import jqGridJSONEmitter
 
 auth = DjangoStaffAuthentication()
 upload_auth = DjangoUploadAuthentication()

@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 
-from admin_views import *
-from admin import fiber_admin_site
+from fiber.admin_views import *
+from fiber.frontendadmin import fiber_admin_site
 
 
 urlpatterns = patterns('',
